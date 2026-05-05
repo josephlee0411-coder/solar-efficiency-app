@@ -3,56 +3,76 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
+plt.rcParams['font.family'] = 'NanumGothic'
+plt.rcParams['axes.unicode_minus'] = False
+
 st.title("🌞 태양광 효율 최적화 시스템")
 
-st.sidebar.header("환경 설정")
+# 메뉴 선택
+menu = st.sidebar.selectbox(
+    "기능 선택",
+    ["현재 효율 계산", "자동 최적화", "시뮬레이션"]
+)
 
-sun_angle = st.sidebar.slider("태양 각도 (°)", 0, 90, 45)
-panel_angle = st.sidebar.slider("패널 각도 (°)", 0, 90, 30)
-temp = st.sidebar.slider("온도 (°C)", 0, 80, 25)
+# 공통 함수
+def calculate_efficiency(sun_angle, panel_angle, temp):
+    angle_diff = abs(panel_angle - sun_angle)
+    efficiency = math.cos(math.radians(angle_diff))
+    temp_loss = max(0, (temp - 25) * 0.005)
+    return max(0, efficiency - temp_loss)
 
-# 효율 계산
-angle_diff = abs(panel_angle - sun_angle)
-efficiency = math.cos(math.radians(angle_diff))
-temp_loss = max(0, (temp - 25) * 0.005)
-final_eff = max(0, efficiency - temp_loss)
+# ------------------------
+# 1️⃣ 현재 효율 계산
+# ------------------------
+if menu == "현재 효율 계산":
+    st.header("📊 현재 효율 계산")
 
-st.subheader("📊 현재 효율")
-st.write(f"👉 {round(final_eff*100, 2)} %")
+    sun_angle = st.number_input("태양 각도", 0, 90, 45)
+    panel_angle = st.number_input("패널 각도", 0, 90, 30)
+    temp = st.number_input("온도", 0, 80, 25)
 
-# 자동 최적화
-if st.button("⚡ 자동 최적화 실행"):
-    st.success(f"최적 패널 각도: {sun_angle}°")
+    if st.button("계산"):
+        eff = calculate_efficiency(sun_angle, panel_angle, temp)
+        st.success(f"👉 효율: {round(eff*100,2)} %")
 
-# 각도 그래프
-st.subheader("📈 각도 vs 효율")
+# ------------------------
+# 2️⃣ 자동 최적화
+# ------------------------
+elif menu == "자동 최적화":
+    st.header("⚡ 자동 최적화 (Sun Tracking)")
 
-angles = np.linspace(0, 90, 100)
-eff_list = []
+    sun_angle = st.number_input("태양 각도", 0, 90, 45)
 
-for a in angles:
-    diff = abs(a - sun_angle)
-    eff = math.cos(math.radians(diff)) - temp_loss
-    eff_list.append(max(0, eff))
+    if st.button("최적화 실행"):
+        st.success(f"👉 최적 패널 각도: {sun_angle}°")
 
-plt.figure()
-plt.plot(angles, eff_list)
-plt.xlabel("패널 각도")
-plt.ylabel("효율")
-st.pyplot(plt)
+# ------------------------
+# 3️⃣ 시뮬레이션
+# ------------------------
+elif menu == "시뮬레이션":
+    st.header("📈 시뮬레이션")
 
-# 온도 그래프
-st.subheader("🌡 온도 vs 효율")
+    sun_angle = st.slider("태양 각도", 0, 90, 45)
+    temp = st.slider("온도", 0, 80, 25)
 
-temps = np.linspace(0, 80, 100)
-eff_temp = []
+    # 각도 vs 효율
+    st.subheader("각도 vs 효율")
+    angles = np.linspace(0, 90, 100)
+    eff_list = [calculate_efficiency(sun_angle, a, temp) for a in angles]
 
-for t in temps:
-    loss = max(0, (t - 25) * 0.005)
-    eff_temp.append(max(0, efficiency - loss))
+    plt.figure()
+    plt.plot(angles, eff_list)
+    plt.xlabel("패널 각도")
+    plt.ylabel("효율")
+    st.pyplot(plt)
 
-plt.figure()
-plt.plot(temps, eff_temp)
-plt.xlabel("온도")
-plt.ylabel("효율")
-st.pyplot(plt)
+    # 온도 vs 효율
+    st.subheader("온도 vs 효율")
+    temps = np.linspace(0, 80, 100)
+    eff_temp = [calculate_efficiency(sun_angle, sun_angle, t) for t in temps]
+
+    plt.figure()
+    plt.plot(temps, eff_temp)
+    plt.xlabel("온도")
+    plt.ylabel("효율")
+    st.pyplot(plt)
