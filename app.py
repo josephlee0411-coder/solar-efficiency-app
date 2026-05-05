@@ -68,8 +68,9 @@ elif menu == "시뮬레이션":
 
     plt.figure()
     plt.plot(angles, eff_list)
-    plt.xlabel("패널 각도")
-    plt.ylabel("효율")
+    plt.xlabel("Panel Angle (°)")
+    plt.ylabel("Efficiency")
+    plt.title("Angle vs Efficiency")
     st.pyplot(plt)
 
     # 온도 vs 효율
@@ -79,6 +80,8 @@ elif menu == "시뮬레이션":
 
     plt.figure()
     plt.plot(temps, eff_temp)
-    plt.xlabel("온도")
-    plt.ylabel("효율")
+    plt.xlabel("Temperature (°C)")
+    plt.ylabel("Efficiency")
+    plt.title("Temperature vs Efficiency")
     st.pyplot(plt)
+    plt.grid(True)
