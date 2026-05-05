@@ -4,9 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 
-font_path = "/usr/share/fonts/truetype/nanum/NanumGothic.ttf"
-font = fm.FontProperties(fname=font_path)
-plt.rc('font', family=font.get_name())
+plt.xlabel("Angle")
+plt.ylabel("Efficiency")
+plt.title("Angle vs Efficiency")
 
 plt.rcParams['font.family'] = 'NanumGothic'
 plt.rcParams['axes.unicode_minus'] = False
